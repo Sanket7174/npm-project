@@ -1,0 +1,24 @@
+{
+  "name": "npm-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sanket7174/npm-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sanket7174/npm-project/issues"
+  },
+  "homepage": "https://github.com/Sanket7174/npm-project#readme",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  }
+}
