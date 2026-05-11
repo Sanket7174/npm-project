@@ -1,32 +1,20 @@
 const fs = require("fs");
 const pdf = require("pdf-parse");
 
-const pdfPath = process.argv[2];
+const filePath = "C:\\Users\\Admin\\Downloads\\MBBS-R1.pdf";
 
-if (!pdfPath) {
-  console.log("Usage: node extractrawdata.js <pdf-path>");
-  console.log('Example: node extractrawdata.js "C:\\Users\\Admin\\Downloads\\MBBS-R1.pdf"');
-  process.exit(1);
-}
+const dataBuffer = fs.readFileSync(filePath);
 
-console.log("Reading PDF:", pdfPath);
-const buffer = fs.readFileSync(pdfPath);
-console.log("Parsing... please wait...");
+pdf(dataBuffer)
+  .then(function (data) {
 
-pdf(buffer).then(data => {
-  const lines = data.text.split("\n");
-  let count = 0;
+    // RAW DATA with \n visible
+    console.log(JSON.stringify(data.text));
 
-  lines.forEach(line => {
-    line = line.trim();
-    if (/^\d+\s+\d+\s+\d{10}/.test(line)) {
-      console.log(line);
-      count++;
-    }
+  })
+  .catch(function (err) {
+
+    console.log(err);
+
   });
-
-  console.error("\nTotal records found:", count);
-
-}).catch(err => {
-  console.log("Error:", err.message);
-});
+  
