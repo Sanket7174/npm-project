@@ -9,8 +9,9 @@ pdf(dataBuffer)
   .then(function (data) {
 
     // RAW DATA with \n visible
-    console.log(JSON.stringify(data.text));
-
+  
+   console.log(data);
+   console.log(JSON.stringify(data.text));
   })
   .catch(function (err) {
 
