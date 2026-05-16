@@ -11,7 +11,9 @@ pdf(dataBuffer)
     // RAW DATA with \n visible
   
    console.log(data);
-   console.log(JSON.stringify(data.text));
+  //  console.log(JSON.stringify(data.text));
+  const lines = data.text.split("\n");
+  console.log(lines);
   })
   .catch(function (err) {
 
