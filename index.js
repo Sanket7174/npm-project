@@ -1,20 +1,23 @@
 const fs = require("fs");
 const pdf = require("pdf-parse");
 
+function extractLinesFromPdf(filePath) {
+  const dataBuffer = fs.readFileSync(filePath);
+
+  return pdf(dataBuffer)
+    .then(function (data) {
+      const lines = data.text.split("\n");
+      return lines;
+    });
+}
+
 const filePath = "C:\\Users\\Admin\\Downloads\\MBBS-R1.pdf";
 
-const dataBuffer = fs.readFileSync(filePath);
-
-pdf(dataBuffer)
-  .then(function (data) {
-
-
-  const lines = data.text.split("\n");
-  console.log(lines);
+// Executing the step
+extractLinesFromPdf(filePath)
+  .then((lines) => {
+    console.log(lines);
   })
-  .catch(function (err) {
-
-    console.log(err);
-
-  });
-  
+  .catch((err) => {
+    console.log("Error in step:", err);
+  });
