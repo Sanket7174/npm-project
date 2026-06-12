@@ -63,35 +63,37 @@ function parseAllLines(lines) {
     if (remaining.length > 0) {
       let lookAheadIndex = 0;
 
-  
       const firstToken = remaining[0];
       if (knownCategories.includes(firstToken) || firstToken.includes("NT") || firstToken.includes("PWD")) {
         Category = firstToken;
         lookAheadIndex = 1;
 
-    
         if (remaining[1] && (remaining[1] === "PWD" || remaining[1] === "DEF" || remaining[1] === "HA")) {
           Category += " " + remaining[1];
           lookAheadIndex = 2;
         }
       }
 
-      const finalString = remaining.slice(lookAheadIndex).join(" ").trim();
+      const afterCategory = remaining.slice(lookAheadIndex);
 
-      
-      if (finalString.includes("Choice Not Available")) {
-      
-        Quota = finalString.replace("Choice Not Available", "").trim();
-        College = "Choice Not Available";
-      } else {
-    
-        const collegeCodeMatch = finalString.match(/(\d{4}[:\s].+)$/);
-        if (collegeCodeMatch) {
-          College = collegeCodeMatch[1].trim();
-          Quota = finalString.replace(collegeCodeMatch[1], "").trim();
-        } else {
-          Quota = finalString;
+      let collegeStartIdx = -1;
+      for (let j = 0; j < afterCategory.length; j++) {
+        if (/^\d{4}$/.test(afterCategory[j]) || /^\d{4}:/.test(afterCategory[j])) {
+          collegeStartIdx = j;
+          break;
         }
+      }
+
+      if (afterCategory.join(" ").includes("Choice Not Available")) {
+        const cnaIdx = afterCategory.indexOf("Choice");
+        Quota = afterCategory.slice(0, cnaIdx).join(" ").trim();
+        College = "Choice Not Available";
+      } else if (collegeStartIdx !== -1) {
+        Quota = afterCategory.slice(0, collegeStartIdx).join(" ").trim();
+        College = afterCategory.slice(collegeStartIdx).join(" ").trim();
+      } else {
+        Quota = afterCategory.join(" ").trim();
+        College = "";
       }
     }
 
