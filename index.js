@@ -1,49 +1,76 @@
-const fs = require('fs');
-const pdf = require('pdf-parse');
-const xlsx =require('xlsx');
+const fs = require("fs");
+const pdf = require("pdf-parse");
+const xlsx = require("xlsx");
+
+const inputFile = "C:\\Users\\Admin\\Downloads\\MBBS-R1.pdf";
+const outputFile = "C:\\Users\\Admin\\Downloads\\ExtractedData.xlsx";
+
 async function extractTableToExcel() {
-    try {
-    const dataBuffer= fs.readFileSync('C:\\Users\\Admin\\Downloads\\MBBS-R1.pdf');
-    const data =await pdf(dataBuffer);
-    const lines=data.text.split('\n');
+    
+        const dataBuffer = fs.readFileSync(inputFile);
+        const data = await pdf(dataBuffer);
+        const processingStart = Date.now();
+        const lines = data.text.split("\n");
+        const excelData = [
+            [
+                "Sr. No.",
+                "AIR",
+                "Roll No.",
+                "CET Form No.",
+                "Name",
+                "Gender",
+                "Category",
+                "Quota",
+                "College Code"
+            ]
+        ];
 
-    const excelData=[];
-    excelData.push(["Sr. No.", "AIR", "Roll No.","CET Form No.", " Name", "Gender", "Category", "Quota", "College Code"]);
-        const validLines = lines.filter(line => { 
-            const clean =line.trim();
+        const rows = await Promise.all(
+          lines.map(async (line) => {
 
-        
-            const parts= clean.split(/\s+/);
+        const srNo = line.substring(0, 7).trim();
+        const air = line.substring(7, 15).trim();
 
-            return parts.length >5 &&
-            !isNaN(parts[0])&&
-            !isNaN(parts[1]);
-        });
-         validLines.forEach(line=>{
-            const srNo=line.substring(0,7).trim();
-            const air=line.substring(7,15).trim();
-            const rollNo=line.substring(15,27).trim();
-            const CETFormNo=line.substring(27,40).trim();
-            const Name=line.substring(40,73).trim();
-            const Gender=line.substring(73,76).trim();
-            const Category=line.substring(76,87).trim();
-            const quota=line.substring(87,114).trim();
-            const CollegeCode=line.substring(114).trim();
+        if (!srNo || !air || isNaN(srNo) || isNaN(air)) {
+            return null;
+        }
 
-        excelData.push([srNo, air, rollNo, CETFormNo, Name, Gender, Category, quota, CollegeCode]);
+        return [
+            srNo,
+            air,
+            line.substring(15, 27).trim(),
+            line.substring(27, 40).trim(),
+            line.substring(40, 73).trim(),
+            line.substring(73, 76).trim(),
+            line.substring(76, 87).trim(),
+            line.substring(87, 114).trim(),
+            line.substring(114).trim()
+        ];
+    })
+);
 
-         });
-         const workbook=xlsx.utils.book_new();
-         const worksheet=xlsx.utils.aoa_to_sheet(excelData);
-         xlsx.utils.book_append_sheet(workbook,worksheet,"Allotements");
-         xlsx.writeFile(workbook,"C:\\Users\\Admin\\Downloads\\ExtractedData.xlsx");
-         console.log("Extraction Completed with adjusted Substrings");
-            
-            }catch(error) {
-                console.error("Error:",error);
-               }
-             }
+        excelData.push(...rows.filter(Boolean));
 
+        const worksheet = xlsx.utils.aoa_to_sheet(excelData);
 
-            extractTableToExcel();
+        const workbook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Allotements"
+        );
 
+        const processingEnd = Date.now();
+
+        console.log(
+            "Processing Time (Without PDF Parse & Excel Write):",
+            processingEnd - processingStart,
+            "ms"
+        );
+
+        xlsx.writeFile(workbook, outputFile);
+        console.log("Extraction Completed Successfully");
+
+}
+
+   extractTableToExcel();
